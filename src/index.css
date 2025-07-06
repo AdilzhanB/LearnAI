@@ -1,0 +1,257 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+/* KaTeX styles */
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css');
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+/* Custom components */
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+  }
+  
+  .btn-accent {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+  }
+  
+  .card {
+    @apply bg-white bg-opacity-20 backdrop-blur-lg rounded-xl shadow-xl border border-white border-opacity-20 p-6 transition-all duration-300 hover:bg-opacity-30 hover:shadow-2xl;
+  }
+  
+  .glass-card {
+    @apply bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-xl border border-white border-opacity-20 p-6 transition-all duration-300 hover:bg-opacity-20 hover:shadow-2xl;
+  }
+  
+  .neural-node {
+    @apply w-4 h-4 rounded-full bg-gradient-to-br from-neural-400 to-neural-600 shadow-lg animate-neuron-pulse;
+  }
+  
+  .algorithm-card {
+    @apply bg-white bg-opacity-20 backdrop-blur-lg rounded-xl shadow-xl border border-white border-opacity-20 p-6 transition-all duration-300 hover:bg-opacity-30 hover:shadow-2xl hover:transform hover:scale-105 cursor-pointer;
+  }
+  
+  .code-block {
+    @apply bg-gray-900 bg-opacity-80 backdrop-blur-lg rounded-lg p-4 font-fira-code text-sm overflow-x-auto;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  }
+  
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 100px rgba(59, 130, 246, 0.1);
+  }
+  
+  .math-expression {
+    @apply bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-4 border border-white border-opacity-20 my-4;
+  }
+}
+
+/* Animation classes */
+@layer utilities {
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-gradient {
+    background-size: 400% 400%;
+    animation: gradient-xy 15s ease infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+  
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    @apply bg-gray-800 bg-opacity-80;
+  }
+  
+  .glass-card {
+    @apply bg-gray-900 bg-opacity-60;
+  }
+  
+  .algorithm-card {
+    @apply bg-gray-800 bg-opacity-80;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .card, .glass-card, .algorithm-card {
+    @apply p-4;
+  }
+}
+
+/* Loading animations */
+.loading-spinner {
+  @apply w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin;
+}
+
+.loading-dots {
+  @apply flex space-x-2;
+}
+
+.loading-dots div {
+  @apply w-2 h-2 bg-primary-600 rounded-full animate-bounce;
+}
+
+.loading-dots div:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.loading-dots div:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Progress bars */
+.progress-bar {
+  @apply bg-gray-200 rounded-full h-2 overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-gradient-to-r from-primary-500 to-secondary-500 transition-all duration-300 ease-out;
+}
+
+/* Tooltip styles */
+.tooltip {
+  @apply absolute z-50 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-lg opacity-0 transition-opacity duration-200 pointer-events-none;
+}
+
+.tooltip.show {
+  @apply opacity-100;
+}
+
+/* Neural network visualization */
+.neural-connection {
+  @apply stroke-current text-primary-400 opacity-60;
+  stroke-width: 2;
+  stroke-dasharray: 5,5;
+  animation: dash 2s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Code syntax highlighting custom styles */
+.code-highlight {
+  @apply bg-gray-900 bg-opacity-90 backdrop-blur-lg rounded-lg p-4 font-fira-code text-sm overflow-x-auto border border-gray-700;
+}
+
+.code-highlight pre {
+  @apply m-0 p-0;
+}
+
+.code-highlight code {
+  @apply text-gray-100;
+}
+
+/* Math notation styles */
+.math-display {
+  @apply text-center my-6 p-4 bg-white bg-opacity-10 backdrop-blur-lg rounded-lg border border-white border-opacity-20;
+}
+
+.math-inline {
+  @apply inline-block px-2 py-1 bg-white bg-opacity-10 backdrop-blur-lg rounded border border-white border-opacity-20;
+}
+
+/* Interactive elements */
+.interactive-button {
+  @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105;
+}
+
+.interactive-button::before {
+  content: '';
+  @apply absolute top-0 left-0 w-full h-full bg-white opacity-0 transition-opacity duration-300;
+}
+
+.interactive-button:hover::before {
+  @apply opacity-10;
+}
+
+/* Notification styles */
+.notification {
+  @apply fixed top-4 right-4 z-50 max-w-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 ease-out;
+}
+
+.notification.success {
+  @apply bg-green-500 text-white;
+}
+
+.notification.error {
+  @apply bg-red-500 text-white;
+}
+
+.notification.warning {
+  @apply bg-yellow-500 text-white;
+}
+
+.notification.info {
+  @apply bg-blue-500 text-white;
+}
