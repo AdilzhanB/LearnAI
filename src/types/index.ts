@@ -391,29 +391,3 @@ export enum NotificationType {
 }
 
 // Export all types
-export type {
-  Algorithm,
-  CodeExample,
-  MathContent,
-  AlgorithmSection,
-  QuizQuestion,
-  UserProgress,
-  Achievement,
-  AchievementRequirement,
-  LearningPath,
-  Project,
-  Resource,
-  ChatMessage,
-  UserProfile,
-  UserPreferences,
-  AlgorithmFilter,
-  SortOption,
-  ApiResponse,
-  PaginatedResponse,
-  LearningAnalytics,
-  WeeklyStats,
-  MonthlyStats,
-  Leaderboard,
-  LeaderboardEntry,
-  Notification
-};

@@ -10,7 +10,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../config/firebase';
-import { UserProfile } from '../types';
+import { UserProfile, ProgrammingLanguage } from '../types';
 import toast from 'react-hot-toast';
 
 interface AuthContextType {
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   achievements: true
                 },
                 learningPreferences: {
-                  preferredProgrammingLanguage: 'python',
+                  preferredProgrammingLanguage: ProgrammingLanguage.PYTHON,
                   difficultyProgression: 'gradual',
                   studyTime: 30,
                   reminderTime: '18:00'

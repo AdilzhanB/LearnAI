@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
@@ -22,19 +22,14 @@ const Settings = React.lazy(() => import('./pages/Settings'));
 const Auth = React.lazy(() => import('./pages/Auth'));
 
 // Context Providers
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ProgressProvider } from './contexts/ProgressContext';
-
-// Hooks
-import { useAuth } from './hooks/useAuth';
-
-// Styles
-import './App.css';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const { i18n } = useTranslation();
+  const location = useLocation();
 
   if (loading) {
     return (

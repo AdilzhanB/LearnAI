@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { UserProgress, Algorithm, Achievement, LearningAnalytics } from '../types';
+import { UserProgress, Algorithm, Achievement, LearningAnalytics, ProgressStatus, AchievementCategory, AchievementRarity } from '../types';
 import { useAuth } from './AuthContext';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -165,7 +165,7 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
       const progressData: UserProgress = {
         algorithmId,
         userId: user.uid,
-        status: 'in_progress',
+        status: ProgressStatus.IN_PROGRESS,
         completedSections: [],
         timeSpent: 0,
         accuracy: 0,
@@ -211,7 +211,7 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
 
     try {
       const updates: Partial<UserProgress> = {
-        status: 'completed',
+        status: ProgressStatus.COMPLETED,
         completedAt: new Date()
       };
 
@@ -309,9 +309,9 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
         name: 'First Steps',
         description: 'Complete your first algorithm',
         icon: '🎯',
-        category: 'milestone',
+        category: AchievementCategory.MILESTONE,
         points: 100,
-        rarity: 'common',
+        rarity: AchievementRarity.COMMON,
         requirements: [{ type: 'algorithms_completed', value: 1 }],
         unlockedAt: new Date()
       };
