@@ -46,17 +46,141 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Enable real authentication flow
+    const enableRealAuth = true; // Set to true to show login page
+    
+    if (!enableRealAuth && import.meta.env.DEV) {
+      const mockUser = {
+        uid: 'dev-user-123',
+        email: 'dev@example.com',
+        displayName: 'Developer',
+        photoURL: null,
+        emailVerified: true,
+        isAnonymous: false,
+        metadata: {
+          creationTime: new Date().toISOString(),
+          lastSignInTime: new Date().toISOString()
+        },
+        providerData: [],
+        refreshToken: 'mock-refresh-token',
+        tenantId: null,
+        delete: async () => {},
+        getIdToken: async () => 'mock-token',
+        getIdTokenResult: async () => ({
+          token: 'mock-token',
+          expirationTime: new Date(Date.now() + 3600000).toISOString(),
+          authTime: new Date().toISOString(),
+          issuedAtTime: new Date().toISOString(),
+          signInProvider: 'custom',
+          signInSecondFactor: null,
+          claims: {}
+        }),
+        reload: async () => {},
+        toJSON: () => ({}),
+        phoneNumber: null,
+        providerId: 'firebase'
+      } as User;
+
+      const mockProfile: UserProfile = {
+        uid: 'dev-user-123',
+        email: 'dev@example.com',
+        displayName: 'Developer',
+        photoURL: undefined,
+        level: 1,
+        experiencePoints: 0,
+        globalRank: 0,
+        totalTimeSpent: 0,
+        algorithmsCompleted: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        preferredLanguage: 'en',
+        learningGoals: [],
+        achievements: [],
+        preferences: {
+          theme: 'light',
+          language: 'en',
+          notifications: {
+            email: true,
+            push: true,
+            dailyReminder: true,
+            weeklyProgress: true,
+            achievements: true
+          },
+          learningPreferences: {
+            preferredProgrammingLanguage: ProgrammingLanguage.PYTHON,
+            difficultyProgression: 'gradual',
+            studyTime: 30,
+            reminderTime: '18:00'
+          }
+        },
+        createdAt: new Date(),
+        lastActive: new Date()
+      };
+
+      setUser(mockUser);
+      setUserProfile(mockProfile);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       
       if (user) {
         // Fetch user profile from Firestore
         try {
+          // Try to get user data from Firestore
           const userDoc = await getDoc(doc(db, 'users', user.uid));
+          
           if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile);
+            const userData = userDoc.data();
+            // Ensure the data matches UserProfile type
+            const profile: UserProfile = {
+              uid: userData.uid ?? user.uid,
+              email: userData.email ?? user.email ?? '',
+              displayName: userData.displayName ?? user.displayName ?? '',
+              photoURL: userData.photoURL ?? user.photoURL ?? undefined,
+              level: userData.level ?? 1,
+              experiencePoints: userData.experiencePoints ?? 0,
+              globalRank: userData.globalRank ?? 0,
+              totalTimeSpent: userData.totalTimeSpent ?? 0,
+              algorithmsCompleted: userData.algorithmsCompleted ?? 0,
+              currentStreak: userData.currentStreak ?? 0,
+              longestStreak: userData.longestStreak ?? 0,
+              preferredLanguage: userData.preferredLanguage ?? 'en',
+              learningGoals: userData.learningGoals ?? [],
+              achievements: userData.achievements ?? [],
+              preferences: userData.preferences ?? {
+                theme: 'light',
+                language: 'en',
+                notifications: {
+                  email: true,
+                  push: true,
+                  dailyReminder: true,
+                  weeklyProgress: true,
+                  achievements: true
+                },
+                learningPreferences: {
+                  preferredProgrammingLanguage: ProgrammingLanguage.PYTHON,
+                  difficultyProgression: 'gradual',
+                  studyTime: 30,
+                  reminderTime: '18:00'
+                }
+              },
+              createdAt: userData.createdAt ? new Date(userData.createdAt) : new Date(),
+              lastActive: userData.lastActive ? new Date(userData.lastActive) : new Date()
+            };
+            setUserProfile(profile);
+            
+            // Try to update last active timestamp, but don't block if it fails
+            updateDoc(doc(db, 'users', user.uid), {
+              lastActive: new Date()
+            }).catch(err => {
+              console.warn('Could not update last active timestamp:', err);
+              // Continue silently - this is not critical
+            });
           } else {
-            // Create new user profile
+            // Create new user profile if it doesn't exist
             const newProfile: UserProfile = {
               uid: user.uid,
               email: user.email!,
@@ -93,12 +217,63 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               lastActive: new Date()
             };
             
-            await setDoc(doc(db, 'users', user.uid), newProfile);
+            try {
+              await setDoc(doc(db, 'users', user.uid), newProfile);
+            } catch (err) {
+              console.warn('Failed to create user profile in Firestore, using local profile:', err);
+            }
+            
             setUserProfile(newProfile);
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
-          toast.error('Failed to load user profile');
+          // Create a fallback profile when offline
+          const fallbackProfile: UserProfile = {
+            uid: user.uid,
+            email: user.email ?? '',
+            displayName: user.displayName || user.email?.split('@')[0] || 'User',
+            photoURL: user.photoURL || undefined,
+            level: 1,
+            experiencePoints: 0,
+            globalRank: 0,
+            totalTimeSpent: 0,
+            algorithmsCompleted: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            preferredLanguage: 'en',
+            learningGoals: [],
+            achievements: [],
+            preferences: {
+              theme: 'light',
+              language: 'en',
+              notifications: {
+                email: true,
+                push: true,
+                dailyReminder: true,
+                weeklyProgress: true,
+                achievements: true
+              },
+              learningPreferences: {
+                preferredProgrammingLanguage: ProgrammingLanguage.PYTHON,
+                difficultyProgression: 'gradual',
+                studyTime: 30,
+                reminderTime: '18:00'
+              }
+            },
+            createdAt: new Date(),
+            lastActive: new Date(),
+            // Optionally add a custom property to indicate offline profile
+            // @ts-ignore
+            isOfflineProfile: true
+          };
+          setUserProfile(fallbackProfile);
+          
+          // Only show the error toast if we're not in a known offline state
+          if ((error as any)?.message !== 'Failed to get document because the client is offline.') {
+            toast.error('Failed to load user profile');
+          } else {
+            toast('Using offline profile data');
+          }
         }
       } else {
         setUserProfile(null);

@@ -56,13 +56,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Apply theme to document
-    document.documentElement.classList.toggle('dark', actualTheme === 'dark');
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(actualTheme);
     
     // Update meta theme-color for mobile browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', actualTheme === 'dark' ? '#1f2937' : '#ffffff');
     }
+    
+    console.log(`Theme applied: ${actualTheme}`);
   }, [actualTheme]);
 
   const setTheme = (newTheme: Theme) => {

@@ -31,7 +31,10 @@ const AppContent: React.FC = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
 
+  console.log('AppContent: user =', user, 'loading =', loading);
+
   if (loading) {
+    console.log('AppContent: Showing loading spinner');
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
         <LoadingSpinner size="large" />
@@ -40,6 +43,7 @@ const AppContent: React.FC = () => {
   }
 
   if (!user) {
+    console.log('AppContent: No user, showing Auth page');
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
         <Suspense fallback={<LoadingSpinner size="large" />}>
@@ -49,12 +53,13 @@ const AppContent: React.FC = () => {
     );
   }
 
+  console.log('AppContent: User authenticated, showing main app');
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 ml-64 p-6">
+        <main className="flex-1 ml-16 md:ml-64 p-6 mt-16 transition-all duration-300">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -74,7 +79,6 @@ const AppContent: React.FC = () => {
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="*" element={<div>Page Not Found</div>} />
                 </Routes>
               </Suspense>
             </motion.div>
@@ -86,29 +90,29 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  console.log('App: Starting application');
+  
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <ThemeProvider>
+      <ThemeProvider>
+        <AuthProvider>
           <ProgressProvider>
             <Router>
               <AppContent />
-              <Toaster
+              <Toaster 
                 position="top-right"
                 toastOptions={{
-                  className: 'bg-white shadow-lg rounded-lg',
                   duration: 4000,
                   style: {
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: '#363636',
+                    color: '#fff',
                   },
                 }}
               />
             </Router>
           </ProgressProvider>
-        </ThemeProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };

@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import toast from 'react-hot-toast';
+import { User } from 'firebase/auth';
 
 interface ProgressState {
   userProgress: Record<string, UserProgress>;
@@ -18,7 +19,7 @@ type ProgressAction =
   | { type: 'UPDATE_PROGRESS'; payload: UserProgress }
   | { type: 'SET_ACHIEVEMENTS'; payload: Achievement[] }
   | { type: 'ADD_ACHIEVEMENT'; payload: Achievement }
-  | { type: 'SET_ANALYTICS'; payload: LearningAnalytics };
+  | { type: 'SET_ANALYTICS'; payload: LearningAnalytics | null };
 
 const initialState: ProgressState = {
   userProgress: {},
@@ -91,7 +92,7 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
     if (user) {
       loadUserProgress();
       loadAchievements();
-      loadAnalytics();
+      loadAnalytics(user);
     }
   }, [user]);
 
@@ -145,16 +146,41 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
     }
   };
 
-  const loadAnalytics = async () => {
-    if (!user) return;
+  const loadAnalytics = async (user: User) => {
+    // Default fallback analytics data
+    const defaultAnalytics = {
+      userId: user.uid,
+      totalTimeSpent: 0,
+      algorithmsCompleted: 0,
+      averageAccuracy: 0,
+      categoriesProgress: {},
+      difficultyProgress: {},
+      learningStreak: 0,
+      weeklyStats: [],
+      monthlyStats: [],
+      lastUpdated: new Date()
+    };
 
     try {
       const analyticsDoc = await getDoc(doc(db, 'analytics', user.uid));
       if (analyticsDoc.exists()) {
         dispatch({ type: 'SET_ANALYTICS', payload: analyticsDoc.data() as LearningAnalytics });
+      } else {
+        // If no analytics document exists, use the default
+        dispatch({ type: 'SET_ANALYTICS', payload: defaultAnalytics as unknown as LearningAnalytics });
       }
     } catch (error) {
       console.error('Error loading analytics:', error);
+      
+      // Set default analytics when offline
+      dispatch({ type: 'SET_ANALYTICS', payload: defaultAnalytics as unknown as LearningAnalytics });
+      
+      // Only show an error toast if it's not a known offline error
+      if ((error as any)?.message !== 'Failed to get document because the client is offline.') {
+        toast.error('Failed to load progress analytics');
+      } else {
+        toast('Using offline progress data');
+      }
     }
   };
 
@@ -324,7 +350,9 @@ export const ProgressProvider: React.FC<ProgressProviderProps> = ({ children }) 
   };
 
   const refreshAnalytics = async () => {
-    await loadAnalytics();
+    if (user) {
+      await loadAnalytics(user);
+    }
   };
 
   const value: ProgressContextType = {

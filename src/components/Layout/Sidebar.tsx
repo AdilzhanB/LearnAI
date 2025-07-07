@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
   Home, 
@@ -24,7 +24,18 @@ const Sidebar: React.FC = () => {
   const { logout } = useAuth();
   const { theme, actualTheme, toggleTheme } = useTheme();
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    return savedState ? JSON.parse(savedState) : false;
+  });
+
+  useEffect(() => {
+    // Save collapsed state to localStorage
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+    
+    // Update body class to adjust main content margin
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+  }, [collapsed]);
 
   const menuItems = [
     { id: 'dashboard', label: t('nav.dashboard'), icon: Home, path: '/dashboard' },
